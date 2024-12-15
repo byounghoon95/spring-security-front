@@ -1,15 +1,33 @@
 'use client';
 
-
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Join() {
   const router = useRouter();
+  
+  const handleJoin = async () => {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-  const handleJoin = () => {
-    // 회원가입 로직 추가
-    router.push('/main');
+    const response = await fetch('/api/join', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+
+    const result = await response.json();
+    
+    if (result.code === '0000') {
+      router.push('/signin');
+    } else {
+      console.log(result.message);
+    }
   };
 
   return (
@@ -19,6 +37,7 @@ export default function Join() {
         <div className="mb-4">
           <input
             type="text"
+            id="username"
             placeholder="아이디"
             className="border border-gray-300 p-2 w-full rounded"
           />
@@ -26,6 +45,7 @@ export default function Join() {
         <div className="mb-4">
           <input
             type="password"
+            id="password"
             placeholder="비밀번호"
             className="border border-gray-300 p-2 w-full rounded"
           />

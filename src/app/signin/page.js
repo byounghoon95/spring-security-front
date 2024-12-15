@@ -1,14 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // 로그인 로직 추가
-    router.push('/main'); // 메인 페이지로 이동
+  const handleLogin = async () => {
+
+    // x-www-form-urlencoded 형식으로 데이터를 보냄
+    const formData = new URLSearchParams();
+    formData.append('username', username);
+    formData.append('password', password);
+
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData.toString(),
+    });
+
+    const result = await response.json();
+    
+    if (result.code === '0000') {
+      const { data } = result.data;
+      localStorage.setItem('accessToken', data.accessToken);
+      router.push('/main');
+    } else {
+      console.log(result.message);
+    }
   };
 
   return (
@@ -17,13 +40,19 @@ export default function Login() {
         <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">로그인</h2>
         <input
           type="text"
+          id="username"
           placeholder="아이디"
           className="border border-gray-300 p-2 mb-4 w-full rounded-lg"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
         <input
           type="password"
+          id="password"
           placeholder="비밀번호"
           className="border border-gray-300 p-2 mb-4 w-full rounded-lg"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <button
           onClick={handleLogin}
