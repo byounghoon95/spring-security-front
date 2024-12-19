@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 export default function Join() {
   const router = useRouter();
@@ -10,18 +11,12 @@ export default function Join() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    const response = await fetch('/api/join', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
+    const response = await axios.post('/api/join', {
+      username,
+      password,
     });
 
-    const result = await response.json();
+    const result = response.data;
     
     if (result.code === '0000') {
       router.push('/signin');
